@@ -1,15 +1,17 @@
+import os
 import collections
 import contextlib
 import wave
 from pydub import AudioSegment
 
-def preprocess_wave(wave_path):
-    if wave_path.endswith(('mp3', 'MP3')):
-        print('[INFO] Converting mp3 to wav format')
+def format_wave(wave_path):
+    """wave"""
+    if wave_path.endswith(('mp3', 'MP3')): 
         sound = AudioSegment.from_mp3(wave_path)
         wave_path = wave_path[:-4] + '.wav'
         sound = sound.set_frame_rate(16000).set_channels(1).set_sample_width(2)
         sound.export(wave_path, format='wav')
+        print(f'[INFO] Saved wave file "{os.path.basename(wave_path)}" from mp3')
         
     elif wave_path.endswith(('wav', 'WAV')):
         sound = AudioSegment.from_wav(wave_path)

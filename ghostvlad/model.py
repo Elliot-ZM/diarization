@@ -84,7 +84,6 @@ def vggvox_resnet2d_icassp(input_dim=(257, 250, 1), num_class=8631, mode='train'
     ghost_clusters=args.ghost_cluster
     bottleneck_dim=args.bottleneck_dim
     aggregation = args.aggregation_mode
-    mgpu = len(keras.backend.tensorflow_backend._get_available_gpus())
 
     if net == 'resnet34s':
         inputs, x = backbone.resnet_2D_v1(input_dim=input_dim, mode=mode)
@@ -178,6 +177,7 @@ def vggvox_resnet2d_icassp(input_dim=(257, 250, 1), num_class=8631, mode='train'
     model = keras.models.Model(inputs, y, name='vggvox_resnet2D_{}_{}'.format(loss, aggregation))
 
     if mode == 'train':
+        mgpu = len(keras.backend.tensorflow_backend._get_available_gpus()) 
         if mgpu > 1:
             model = ModelMGPU(model, gpus=mgpu)
         # set up optimizer.

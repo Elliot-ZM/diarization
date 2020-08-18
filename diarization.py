@@ -70,6 +70,7 @@ def diarize(args, segments, sr=16000, win_len=400, hop_len=160, embedding_per_se
     ghostvlad_model.load_weights(GHOSTVLAD_PATH, by_name=True)
 
     # Initialize uisrnn
+    sys.argv = sys.argv[:1]
     model_args, _, inference_args = uisrnn.parse_arguments()
     model_args.observation_dim = 512
     inference_args.num_speaker = args.num_speakers

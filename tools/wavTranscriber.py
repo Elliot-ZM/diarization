@@ -1,37 +1,12 @@
 import webrtcvad
 import os
-import wavSplit
+from . import wavSplit
 from google.cloud import speech_v1 as speech
 from google.cloud.speech_v1 import enums, types
 from tqdm import tqdm
 import contextlib
 import wave
-
-def vad_segment_generator(wavFile, aggressiveness, frame_duration_ms=30, padding_duration_ms=300):
-    # logging.debug("Caught the wav file @: %s" % (wavFile))
-    wavFile = wavSplit.preprocess_wave(wavFile)
-    audio, sample_rate, audio_length = wavSplit.read_wave(wavFile)
-    assert sample_rate == 16000, "Only 16000Hz input WAV files are supported for now!"
-    vad = webrtcvad.Vad(int(aggressiveness))
-    frames = wavSplit.frame_generator(frame_duration_ms, audio, sample_rate)
-    frames = list(frames)
-    segments = wavSplit.vad_collector(sample_rate, frame_duration_ms, padding_duration_ms, vad, frames)
-
-    return [segment for segment in segments], sample_rate, audio_length
  
-def segment_to_text(client, config, segment):
-    audio = types.RecognitionAudio(content = segment.bytes)
-    response = client.recognize(config, audio)
-    speaker = chr(ord("A")+segment.speaker)
-    if not response.results:
-        text = PrintFormat.speaker_text(speaker, underline_text=True)
-    elif response.results:
-        text_string = response.results[0].alternatives[0].transcript.capitalize()
-        text = PrintFormat.speaker_text(speaker, text_string = text_string, underline_text= True)
-                                             
-    return text
-
-
 class PrintFormat(object):
     def speaker_text(speaker, text_string=None, underline_text=True):
         if not text_string:
@@ -49,10 +24,10 @@ class NewSegment(object):
         self.begin = begin
         self.end = end
         self.speaker = speaker
-              
+ 
+
 def arrange_segments(segments):
-    """Remove silence speaker segments and
-    
+    """
     Join same speaker segments if they are separted. 
     """
     new_segments = []
@@ -64,15 +39,10 @@ def arrange_segments(segments):
                                             cur_segment.begin,
                                             cur_segment.end, 
                                             cur_segment.speaker))
-         
         elif cur_idx > 0:
-            
             prev_segment = segments[cur_idx-1]
-            change_flag = False if prev_segment.speaker==cur_segment.speaker else True
-                        
+            change_flag = False if prev_segment.speaker==cur_segment.speaker else True # check speaker tag with previous and current segment
             if change_flag:
-                
-               
                 new_segments.append(NewSegment(cur_segment.bytes,
                                                cur_segment.begin,
                                                cur_segment.end,
@@ -85,8 +55,35 @@ def arrange_segments(segments):
                                               segments[new_idx].begin,
                                               cur_segment.end,
                                               cur_segment.speaker)
-            
     return new_segments
+
+def vad_segment_generator(wavFile, aggressiveness, frame_duration_ms=30, padding_duration_ms=300):
+    """Voice acitivity detection for speech recognition
+    """
+    wavFile = wavSplit.format_wave(wavFile) # formatting the input audio file for diarization
+    audio, sample_rate, audio_length = wavSplit.read_wave(wavFile)
+    assert sample_rate == 16000, "Only 16000Hz input WAV files are supported for now!"
+    vad = webrtcvad.Vad(int(aggressiveness))
+    frames = wavSplit.frame_generator(frame_duration_ms, audio, sample_rate)
+    frames = list(frames)
+    segments = wavSplit.vad_collector(sample_rate, frame_duration_ms, padding_duration_ms, vad, frames)
+
+    return [segment for segment in segments], sample_rate, audio_length
+
+def segment_to_text(client, config, segment):
+    audio = types.RecognitionAudio(content = segment.bytes)
+    if len(segment.bytes)/16000/2 <= 60:
+        response = client.recognize(config, audio)
+    else:
+        response = client.long_running_recognize(config, audio) ## changed with GCS url
+    speaker = chr(ord("A")+segment.speaker)
+    if not response.results:
+        text = PrintFormat.speaker_text(speaker, underline_text=True)
+    elif response.results:
+        text_string = response.results[0].alternatives[0].transcript.capitalize()
+        text = PrintFormat.speaker_text(speaker, text_string = text_string, underline_text= True)
+                                             
+    return text
 
 def write_stt(segments, transcript_file, aggressive=3, sample_rate=16000, silence_thresh=1):
     """Writes audio speakers's segments with google speech recognition to a text file
@@ -95,23 +92,23 @@ def write_stt(segments, transcript_file, aggressive=3, sample_rate=16000, silenc
     client = speech.SpeechClient()
     config = types.RecognitionConfig(encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
                                      sample_rate_hertz=sample_rate,
-                                     language_code='en-US')
-    tq = tqdm(enumerate(segments))
+                                     language_code='en-US') 
     with open(transcript_file, 'w') as f:
+        tq = tqdm(enumerate(segments))
         for i, segment in tq:
             speaker = chr(ord("A")+segment.speaker)
             tq.set_description('Speaker {}'.format(speaker))
             silence_flag = check_silence(segment.bytes, vad, sample_rate=sample_rate, frame_duration_ms=30, silence_thresh= silence_thresh)
             if not silence_flag:
                 output = segment_to_text(client, config, segment)
+                f.write(output)
+                f.flush()
             else:
-                wav_name = os.path.join('result','{}_{}_{}.wav'.format(i, speaker,
-                                                                        os.path.basename(transcript_file)[:-4]))
-                write_wave(wav_name, segment.bytes, sample_rate)
-            f.write(output)
-            f.flush()
+                wav_name = '{}_{}_{}.wav'.format(transcript_file[:-4].replace('transcript','non_voice'), i, speaker) 
+                write_wave(segment.bytes, wav_name, sample_rate)
+             
                 
-def write_wave(wav_name, audio, sample_rate):
+def write_wave(audio, wav_name, sample_rate):
     """Writes a .wav file.
     Takes path, PCM audio data, and sample rate.
     """
