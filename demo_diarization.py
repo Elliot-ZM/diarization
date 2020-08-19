@@ -30,6 +30,7 @@ def main(args):
     elif args.opt == 'audio':
         tq = tqdm(enumerate(joined_segments)) 
         for i, segment in tq:
+            tq.set_description()
             wave_name = os.path.join(output_dir, '{}_{}_{}.wav'.format(os.path.basename(args.audio_file)[:-4],
                                                                        i, chr(ord("A")+segment.speaker)))
             wavTranscriber.write_wave(audio=segment.bytes,
@@ -42,7 +43,7 @@ def main(args):
 
 if __name__ == '__main__': 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--audio_file', default="I am ... an expert.wav",
+    parser.add_argument('--audio_file', default="Mark Zuckerberg's 2004 Interview See How Far He And Facebook Have Come - YouTube.wav",
                         help='input audio file for diarization [mp3 or wav]')
     parser.add_argument('--num_speakers', type=int, default=4, 
                         help='manual speaker limit')
@@ -50,12 +51,12 @@ if __name__ == '__main__':
                         help='remove silence speaker segment with given threshold, default "1 second"')
     parser.add_argument('--pad_silence_ms', type=int, default = 150,
                         help='pad silence duration in millisecond for each segment during voice activity detection')
-    parser.add_argument('--opt', choices = ['text', 'audio'], default = 'text',
+    parser.add_argument('--opt', choices = ['text', 'audio'], default = 'audio',
                         help='option mode for output result')
     
     args = parser.parse_args()
-    audio_path = r'/home/zmh/Desktop/HDD/Workspace/my_github/Speech-Diarization/test-data'
-    args.audio_file = os.path.join(audio_path, args.audio_file) 
+    audio_path = r'/home/zmh/hdd/Custom_Projects/Speaker-Diarization/test-data'
+    args.audio_file = os.path.join(audio_path, args.audio_file)     
     print(args)
     segments, joined_segments = main(args)
     wavTranscriber.PrintFormat.show_segments_info(segments)
