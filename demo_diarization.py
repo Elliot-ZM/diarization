@@ -27,15 +27,22 @@ def main(args):
                                  sample_rate=sample_rate, 
                                  silence_thresh = args.silence_thresh)
     
-    elif args.opt == 'audio':
-        tq = tqdm(enumerate(joined_segments)) 
-        for i, segment in tq:
-            tq.set_description()
+    elif args.opt == 'audio': 
+        for i, segment in enumerate(joined_segments):
+            duration = len(segment.bytes)/sample_rate/2
+            speaker = chr(ord("A")+segment.speaker)
+            tq = tqdm(total = duration) 
+            
             wave_name = os.path.join(output_dir, '{}_{}_{}.wav'.format(os.path.basename(args.audio_file)[:-4],
-                                                                       i, chr(ord("A")+segment.speaker)))
+                                                                       i, speaker))
             wavTranscriber.write_wave(audio=segment.bytes,
                                       wav_name=wave_name,
                                       sample_rate=sample_rate) 
+            tq.set_description(f'Speaker {speaker}')
+            tq.set_postfix(duration = duration)
+            tq.update(duration)
+            tq.close()
+            
     end = timer() - start
     print("\nFinished in {:.2f} minute(s)".format(end/60))
     
@@ -43,25 +50,25 @@ def main(args):
 
 if __name__ == '__main__': 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--audio_file', default="Mark Zuckerberg's 2004 Interview See How Far He And Facebook Have Come - YouTube.wav",
+    parser.add_argument('--audio_file', default="Google's congressional hearing highlights in 11 minutes - 9s.MP3",
                         help='input audio file for diarization [mp3 or wav]')
-    parser.add_argument('--num_speakers', type=int, default=4, 
+    parser.add_argument('--num_speakers', type=int, default=9, 
                         help='manual speaker limit')
     parser.add_argument('--silence_thresh', type=int, default=1, 
                         help='remove silence speaker segment with given threshold, default "1 second"')
-    parser.add_argument('--pad_silence_ms', type=int, default = 150,
+    parser.add_argument('--pad_silence_ms', type=int, default = 60,
                         help='pad silence duration in millisecond for each segment during voice activity detection')
-    parser.add_argument('--opt', choices = ['text', 'audio'], default = 'audio',
+    parser.add_argument('--opt', choices = ['text', 'audio'], default = 'text',
                         help='option mode for output result')
     
     args = parser.parse_args()
-    audio_path = r'/home/zmh/hdd/Custom_Projects/Speaker-Diarization/test-data'
+    audio_path = r'/home/zmh/Desktop/HDD/Workspace/my_github/Speech-Diarization/test-data'
     args.audio_file = os.path.join(audio_path, args.audio_file)     
     print(args)
     segments, joined_segments = main(args)
-    wavTranscriber.PrintFormat.show_segments_info(segments)
-    print()
-    wavTranscriber.PrintFormat.show_segments_info(joined_segments)
+    # wavTranscriber.PrintFormat.show_segments_info(segments)
+    # print()
+    # wavTranscriber.PrintFormat.show_segments_info(joined_segments)
     
         
         
