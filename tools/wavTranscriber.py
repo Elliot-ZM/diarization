@@ -6,7 +6,8 @@ from google.cloud.speech_v1 import enums, types
 from tqdm import tqdm
 import contextlib
 import wave
- 
+import numpy as np
+
 class PrintFormat(object):
     def speaker_text(speaker, text_string=None, underline_text=True):
         if not text_string:
@@ -94,8 +95,9 @@ def write_stt(segments, transcript_file, aggressive=3, sample_rate=16000, silenc
                                      sample_rate_hertz=sample_rate,
                                      language_code='en-US') 
     with open(transcript_file, 'w') as f:
-        tq = tqdm(enumerate(segments))
-        for i, segment in tq:
+        for i, segment in enumerate(segments):
+            duration = len(segment.bytes)/sample_rate/2
+            tq = tqdm(total=duration)
             speaker = chr(ord("A")+segment.speaker)
             tq.set_description('Speaker {}'.format(speaker))
             silence_flag = check_silence(segment.bytes, vad, sample_rate=sample_rate, frame_duration_ms=30, silence_thresh= silence_thresh)
@@ -106,7 +108,8 @@ def write_stt(segments, transcript_file, aggressive=3, sample_rate=16000, silenc
             else:
                 wav_name = '{}_{}_{}.wav'.format(transcript_file[:-4].replace('transcript','non_voice'), i, speaker) 
                 write_wave(segment.bytes, wav_name, sample_rate)
-             
+            tq.update(duration)
+            tq.close() 
                 
 def write_wave(audio, wav_name, sample_rate):
     """Writes a .wav file.
@@ -117,6 +120,12 @@ def write_wave(audio, wav_name, sample_rate):
         wf.setsampwidth(2)
         wf.setframerate(sample_rate)
         wf.writeframes(audio)
+
+def sort_speakers(labels):
+    _, index = np.unique(labels, return_index=True)
+    pairs = {labels[v]:k for k,v in enumerate(sorted(index))}
+    sorted_labels = [pairs[label] for label in labels]
+    return sorted_labels
 
 def check_silence(audio, vad, sample_rate=16000, frame_duration_ms=30, silence_thresh=1):
     """Check voice duration of audio data and 
