@@ -32,14 +32,13 @@ def main(args):
             duration = len(segment.bytes)/sample_rate/2
             speaker = chr(ord("A")+segment.speaker)
             tq = tqdm(total = duration) 
-            
             wave_name = os.path.join(output_dir, '{}_{}_{}.wav'.format(os.path.basename(args.audio_file)[:-4],
                                                                        i, speaker))
             wavTranscriber.write_wave(audio=segment.bytes,
                                       wav_name=wave_name,
                                       sample_rate=sample_rate) 
             tq.set_description(f'Speaker {speaker}')
-            tq.set_postfix(duration = duration)
+            # tq.set_postfix(duration = duration)
             tq.update(duration)
             tq.close()
             
@@ -50,9 +49,10 @@ def main(args):
 
 if __name__ == '__main__': 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--audio_file', default="Google's congressional hearing highlights in 11 minutes - 9s.MP3",
-                        help='input audio file for diarization [mp3 or wav]')
-    parser.add_argument('--num_speakers', type=int, default=9, 
+    parser.add_argument('--audio_file', default="Mark Zuckerberg's 2004 Interview See How Far He And Facebook Have Come - YouTube.wav")
+    parser.add_argument('--output_path', type=str, default="",
+                        help='output file path')
+    parser.add_argument('--num_speakers', type=int, default=4, 
                         help='manual speaker limit')
     parser.add_argument('--silence_thresh', type=int, default=1, 
                         help='remove silence speaker segment with given threshold, default "1 second"')
@@ -60,9 +60,10 @@ if __name__ == '__main__':
                         help='pad silence duration in millisecond for each segment during voice activity detection')
     parser.add_argument('--opt', choices = ['text', 'audio'], default = 'text',
                         help='option mode for output result')
+
     
     args = parser.parse_args()
-    audio_path = r'/home/zmh/Desktop/HDD/Workspace/my_github/Speech-Diarization/test-data'
+    audio_path = r'/home/zmh/hdd/Custom_Projects/Speaker-Diarization/test-data'
     args.audio_file = os.path.join(audio_path, args.audio_file)     
     print(args)
     segments, joined_segments = main(args)
