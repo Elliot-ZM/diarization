@@ -85,7 +85,7 @@ def write_audio_segments(segments, output_path, input_file_name, sample_rate=160
     output_path = os.path.join(output_path, os.path.splitext(os.path.basename(input_file_name))[0])
     os.makedirs(output_path, exist_ok=True)
     pairs  = find_pair(segments)
-    for i, segment in segments:
+    for i, segment in enumerate(segments):
         segment.speaker = pairs[segment.speaker]
         duration = len(segment.bytes)/sample_rate/2
         tq = tqdm(total=duration)
