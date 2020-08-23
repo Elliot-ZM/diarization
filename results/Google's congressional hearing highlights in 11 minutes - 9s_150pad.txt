@@ -1,0 +1,96 @@
+Speaker A : Our only witness today is mr. sundar pichai which eye is the chief executive officer of google.
+
+Speaker B : Kevin goodluck ranking member nadler distinguished members of the comedy thank you for the opportunity to be here today.
+
+Speaker C : More than 90% of all internet searches take place on google what's subsidiary youtube and they are curating what we see google has long faced criticism for manipulating search results to censor conservatives insured of individuals and organizations have had their pro-trump content tagged as hate speech or had their content reduced in search results what are you going to improve that situation.
+
+Speaker B : Congressman thanks for the question if i met some of the studies you mention we have investigated those that are there other studies which have looked at that you found issues with the methodology and the sample size and so on but let me step back and see the lightning uses with high-quality activate and trusted information is sacrosanct to us it's what are principles are on their business interests are natural long-term incentives are aligned with that we want to sell uses everywhere and we need to earn the trust in doing so.
+
+Speaker D : Eliana murillo is google's head of multicultural marketing does miss murillo do good work.
+
+Speaker E : I'm not very familiar with her work but she's an employee of google and you know.
+
+Speaker D : We are proud of our employees or head of multicultural marketing said you were pushing to get out the latino vote paying for a ride to the pole to the polls for the latino vote only in key states and you're saying that's not actor.
+
+Speaker B : Yes that's right we haven't found any evidence to substantiate any of the employees today do their own activate what's the follow-up i want the real answers right here in this committee.
+
+Speaker D : I said earlier we've looked into it we didn't find you push to get out the key boat and i would say the two most populous states for latinos would be california and texas did you push to get out the latino vote and pay for people to go to the polls in california and texas.
+
+Speaker B : We s accompanied into any effort to push out words for any particular demographic that would be against our principles we participate in the civic processing in a non-partisan way and it's really important we do it that way.
+
+Speaker F : I have an iphone and if i move from here and go over there and sit with my democrat friends which will make them real nervous does google track my movement does google through this phone know that i have moved here and moved over to the left at either yes or no not by default they may be a google service which you have opted-in to use and if so google knows that i am moving over there it's it's not a trick question you know you make a hundred million dollars a year you oughta be able to answer that question does google know through this phone that i am moving over there and sit next to mr. johnson which would make him real nervous his question i guess you're no.
+
+Speaker B : Without knowing more details.
+
+Speaker G : I have a concern concerning china in 2010 google left a chinese marketplace due to concerns over half of the tax censorship and how the chinese government was possibly gaining access to data i'm interested in what is changed since 2010 and how working with the chinese government to denser research results for part of google's for values understand my question.
+
+Speaker B : Congressman we right now there are no plans for us to launch a search product in china we are in general always looking to see how best it's part of our core mission in our principles to try hard to provide us with information via be always have evidence based on every country we have operated in us reaching out and giving uses two more information has a very positive impact and and we feel like calling but right now there are no plans to launch in china they extend that we we ever going to approach a decision like that i i will be fully transparent including with policymakers here and an engagement consult widely.
+
+Speaker H : Anticipating what took place in 2016 happening again and in this is specifically regarding what russia did to foment racial tensions in the united states and wanting to know how you are responding to that where they called for you know fake protest either to get african americans to turn out to protest something that was fake or to have white supremacist be jammed up to attack communities of color so specifically what is google doing to respond to that.
+
+Speaker B : We mainly saw with respect to russia limited improper activity on our add platforms.
+
+Speaker E : Wrench-n-go we are not a social networking company across the products we do maybe we haven't done well as a company that we typically are in connecting groups of people and that's not how google mainly works today and so we haven't seen that kind of activities on all platforms but be a vigilant and you know i'm happy to share any findings.
+
+Speaker B : Which come through as we look into it more.
+
+Speaker I : The operating environment in china has deteriorated with respect to surveillance censorship and the lights in school first made the decision 2010 to leave so i'm going to specifically are any employees currently having product meetings on this on this chinese project and went if not when did those end.
+
+Speaker E : We have undertaken an internal effort but right now there are no plans to launch a search service in china sister..
+
+Speaker I : Are there any current discussions with any member of the chinese government on launching this app.
+
+Speaker E : Country ignored in discussions around launching a search product in china.
+
+Speaker I : Are there any current discussions of the members of the chinese government about this.
+
+Speaker E : This effort currently is an internal effort and you know i'm happy to.
+
+Speaker B : ....
+
+Speaker E : Cancel that supposed to be transparent election we take steps to it's launching a product in china.
+
+Speaker I : And who is that google is leading the dragonfly effort.
+
+Speaker B : It's a you know our efforts around building search you know it's it's it's under taken by our search teams but these are distributed efforts.
+
+Speaker E : It's a limited effort internally currently.
+
+Speaker I : Will you miss me try to rule out launching a tool for surveillance and censorship in china while you are ceo of google.
+
+Speaker E : Congressman iii, to engaging one of the things which is important to us as a company.
+
+Speaker B : Devastated mission of providing uses with information.
+
+Speaker E : Until we always we think it's in our duty to explore possibilities to give users access to information and you know i have that commitment but you know what i said earlier on this will be very thoughtful and we will engage widely as we make progress.
+
+Speaker F : This is now 4th hearing in a series are ridiculous hearings on a free speech of internet companies is significant portion this hearing was a waste of time because the first amendment protects private edition rules and corporations free speech rights to search for cosmos steve king emma hit the news tab for sorrow that pops up some abc news it says steve king's racist immigration talk prompts calls for congressional censure that's a negative article you don't have a group of people google sitting here thinking and trying to modify search results every time steve king cuz of comes up negative article appears that's not what's happening right.
+
+Speaker E : Always operate for any credit with the same set of principles we are trying to deflect what is currently in if it is newsworthy what is currently being discussed about that that that phrase.
+
+Speaker F : Thank you so let me just conclude here by stating the obvious if you want positive search results do positive things if you don't want that your search results don't do nothing you're so my colleagues across the aisle with you getting bad press articles and bad search results don't blame google or facebook or twitter considered blaming yourself.
+
+Speaker D : Did google design a prototype for a search engine that could be used in china to censor content.
+
+Speaker A : Congressman be undertaken an internal effort did you create a prototype that there was a report in the intercept that says a prototype for the censored search.
+
+Speaker D : Engine was designed could look like if it if it were to be launched in a country like china and that's what he explored and how many months was that project on going.
+
+Speaker E : We've had the project underway for a while and there'll be another project to feel undertaken for a while and we've never launched them too so it could be a concert dates gloria how many people.
+
+Speaker D : I'm working on it.
+
+Speaker E : Estimates in a number of engineers on the project of varied overtime at 10 at one point we have had four hundred people working on it is my understanding makes the judgment calls.
+
+Speaker A : Regarding content moderation at google.
+
+Speaker B : Chairman it depends on the area so for example if it's youtube we have you know very clear teams which are responsible for.
+
+Speaker A : Youtube content policy sand they identified is it possible for a customer to write to them and say hey.
+
+Speaker E : Is the concern i have become clear channel's for content creators to you know to race constance back and be a player avenue sand and we also had people who are responsible for these platforms in treating content moderation appear here you know and i think i've consulted widely here here to.
+
+Speaker A : Thank you well you've gone for about three and a half hours and about what we predicted isn't it yesterday when we talked so we thank you very much for your participation today this concludes today's hearing and without objection all members will have five legislative days to submit written question for the witness or additional materials for the record with that hearing is adjourned.
+
+Speaker J : ....
+

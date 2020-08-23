@@ -89,8 +89,7 @@ def diarize(args, segments, sr=16000, win_len=400, hop_len=160, embedding_per_se
     feats = np.array(feats)[:, 0, :].astype(float)
 
     # Clustering on d-vector with uisrnn
-    labels = uisrnn_model.predict(feats, inference_args)
-    # print('[INFO] Tagging segments speakers.')
+    labels = uisrnn_model.predict(feats, inference_args) 
     embedding_duration = (1/embedding_per_sec) * (1.0 - overlap_rate)
     labels_count = len(labels)
     current = 0
@@ -104,3 +103,4 @@ def diarize(args, segments, sr=16000, win_len=400, hop_len=160, embedding_per_se
         else:
             segment.speaker = 999
     return segments
+

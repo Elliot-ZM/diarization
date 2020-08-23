@@ -9,7 +9,7 @@ import wave
 import numpy as np
 
 class PrintFormat(object):
-    def speaker_text(speaker, text_string=None, underline_text=True):
+    def speaker_text(speaker, text_string=None):
         if not text_string:
             return f'Speaker {speaker} : ""\n\n'
         return f'Speaker {speaker} : {text_string}.\n\n'
@@ -62,55 +62,14 @@ def vad_segment_generator(wavFile, aggressiveness, frame_duration_ms=30, padding
     """Voice acitivity detection for speech recognition
     """
     wavFile = wavSplit.format_wave(wavFile) # formatting the input audio file for diarization
-    audio, sample_rate, audio_length = wavSplit.read_wave(wavFile)
-    assert sample_rate == 16000, "Only 16000Hz input WAV files are supported for now!"
+    audio, sample_rate, audio_length = wavSplit.read_wave(wavFile) 
     vad = webrtcvad.Vad(int(aggressiveness))
     frames = wavSplit.frame_generator(frame_duration_ms, audio, sample_rate)
     frames = list(frames)
     segments = wavSplit.vad_collector(sample_rate, frame_duration_ms, padding_duration_ms, vad, frames)
 
-    return [segment for segment in segments], sample_rate, audio_length
+    return [segment for segment in segments], sample_rate, audio_length 
 
-def segment_to_text(client, config, segment):
-    audio = types.RecognitionAudio(content = segment.bytes)
-    if len(segment.bytes)/16000/2 <= 60:
-        response = client.recognize(config, audio)
-    else:
-        response = client.long_running_recognize(config, audio) ## changed with GCS url
-    speaker = chr(ord("A")+segment.speaker)
-    if not response.results:
-        text = PrintFormat.speaker_text(speaker, underline_text=True)
-    elif response.results:
-        text_string = response.results[0].alternatives[0].transcript.capitalize()
-        text = PrintFormat.speaker_text(speaker, text_string = text_string, underline_text= True)
-                                             
-    return text
-
-def write_stt(segments, transcript_file, aggressive=3, sample_rate=16000, silence_thresh=1):
-    """Writes audio speakers's segments with google speech recognition to a text file
-    """
-    vad = webrtcvad.Vad(aggressive)
-    client = speech.SpeechClient()
-    config = types.RecognitionConfig(encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
-                                     sample_rate_hertz=sample_rate,
-                                     language_code='en-US') 
-    with open(transcript_file, 'w') as f:
-        for i, segment in enumerate(segments):
-            duration = len(segment.bytes)/sample_rate/2
-            tq = tqdm(total=duration)
-            speaker = chr(ord("A")+segment.speaker)
-            tq.set_description('Speaker {}'.format(speaker))
-            silence_flag = check_silence(segment.bytes, vad, sample_rate=sample_rate, frame_duration_ms=30, silence_thresh= silence_thresh)
-            if not silence_flag:
-                output = segment_to_text(client, config, segment)
-                f.write(output)
-                f.flush()
-            else:
-                wav_name = '{}_{}_{}.wav'.format(transcript_file[:-4].replace('transcript','non_voice'), i, speaker) 
-                write_wave(segment.bytes, wav_name, sample_rate)
-            tq.update(duration)
-            tq.close() 
-                
 def write_wave(audio, wav_name, sample_rate):
     """Writes a .wav file.
     Takes path, PCM audio data, and sample rate.
@@ -121,12 +80,85 @@ def write_wave(audio, wav_name, sample_rate):
         wf.setframerate(sample_rate)
         wf.writeframes(audio)
 
-def sort_speakers(labels):
+def write_audio_segments(segments, output_path, input_file_name, sample_rate=16000):
+    """Write audio wave segments as diarization output"""
+    output_path = os.path.join(output_path, os.path.splitext(os.path.basename(input_file_name))[0])
+    os.makedirs(output_path, exist_ok=True)
+    pairs  = find_pair(segments)
+    for i, segment in segments:
+        segment.speaker = pairs[segment.speaker]
+        duration = len(segment.bytes)/sample_rate/2
+        tq = tqdm(total=duration)
+        speaker = chr(ord("A")+segment.speaker)
+        tq.set_description('Speaker {}'.format(speaker))
+        output_wave = os.path.join(output_path, "{}_Speaker_{}_{:.2f}_sec.wav".format(i, speaker, duration))
+        write_wave(segment.bytes, output_wave, sample_rate)
+        tq.update(duration)
+        tq.close() 
+    
+def write_stt(segments, transcript_file, aggressive=3, sample_rate=16000, silence_thresh=1):
+    """Writes audio speakers's segments with google speech recognition to a text file
+    """
+    vad = webrtcvad.Vad(aggressive)
+    client = speech.SpeechClient()
+    config = types.RecognitionConfig(encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
+                                     sample_rate_hertz=sample_rate,
+                                     language_code='en-US') 
+    with open(transcript_file, 'w') as f:
+        pairs  = find_pair(segments)
+        for i, segment in enumerate(segments):
+            segment.speaker = pairs[segment.speaker]
+            duration = len(segment.bytes)/sample_rate/2
+            tq = tqdm(total=duration)
+            speaker = chr(ord("A")+segment.speaker)
+            tq.set_description('Speaker {}'.format(speaker))
+            silence_flag = check_silence(segment.bytes, vad, sample_rate=sample_rate, frame_duration_ms=30, silence_thresh= silence_thresh)
+            if not silence_flag:
+                output = segment_to_text(client, config, segment, sample_rate)
+                
+            else:
+                output= PrintFormat.speaker_text(speaker, text_string='...') 
+            f.write(output)
+            f.flush()   
+            tq.update(duration)
+            tq.close()
+
+def segment_to_text(client, config, segment, sample_rate=16000): 
+    speaker = chr(ord("A")+segment.speaker) 
+    if len(segment.bytes)/sample_rate/2 <= 60: # check whethere segment is more than 1 minute or not
+        audio = types.RecognitionAudio(content = segment.bytes)
+        response = client.recognize(config, audio)
+        if not response.results:
+            text = PrintFormat.speaker_text(speaker)
+        else:
+            text_strings = response.results[0].alternatives[0].transcript.capitalize() 
+    else:
+        split_audios = gen_bytes_with_limit(segment.bytes, sample_rate, time_limit= 60)
+        text_strings = ""
+        for split_audio in split_audios:
+            audio = types.RecognitionAudio(content = split_audio)
+            response = client.recognize(config, audio)
+            text_string = "" if not response.results else response.results[0].alternatives[0].transcript.capitalize()
+            text_strings += text_string
+            
+    text = PrintFormat.speaker_text(speaker, text_string = text_strings)                   
+    return text
+
+def gen_bytes_with_limit(audio, sample_rate, time_limit=60): 
+    frame_byte_count = int(sample_rate * time_limit * 2)
+    offset = 0 
+    while offset + frame_byte_count -1 < len(audio):
+        yield audio[offset:offset + frame_byte_count] 
+        offset += frame_byte_count
+    yield audio[offset:]  
+    
+def find_pair(segments):
+    labels = [segment.speaker for segment in segments]
     _, index = np.unique(labels, return_index=True)
     pairs = {labels[v]:k for k,v in enumerate(sorted(index))}
-    sorted_labels = [pairs[label] for label in labels]
-    return sorted_labels
-
+    # sorted_labels = [pairs[label] for label in labels]
+    return pairs
+    
 def check_silence(audio, vad, sample_rate=16000, frame_duration_ms=30, silence_thresh=1):
     """Check voice duration of audio data and 
     return silence flag when the voiced duration is shorter than silence_thresh (second) 

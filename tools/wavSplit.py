@@ -5,7 +5,11 @@ import wave
 from pydub import AudioSegment
 
 def format_wave(wave_path):
-    """wave"""
+    """Preprocess input wave file to meet required format for diarization process. 
+    channel = 1
+    sample rate = 16000
+    audio extension = .wav 
+    """
     if wave_path.endswith(('mp3', 'MP3')): 
         sound = AudioSegment.from_mp3(wave_path)
         wave_path = wave_path[:-4] + '.wav'
