@@ -111,7 +111,7 @@ def write_stt(segments, transcript_file, aggressive=3, sample_rate=16000, silenc
             duration = len(segment.bytes)/sample_rate/2
             tq = tqdm(total=duration)
             speaker = chr(ord("A")+segment.speaker)
-            tq.set_description('{}-> Speaker {}'.format(i, speaker))
+            tq.set_description('{}. Speaker {}'.format(i, speaker))
             silence_flag = check_silence(segment.bytes, vad, sample_rate=sample_rate, frame_duration_ms=30, silence_thresh= silence_thresh)
             if not silence_flag:
                 output = segment_to_text(client, config, segment, sample_rate)
@@ -129,7 +129,7 @@ def segment_to_text(client, config, segment, sample_rate=16000):
         audio = types.RecognitionAudio(content = segment.bytes)
         response = client.recognize(config, audio)
         if not response.results:
-            text_strings = ".."
+            text_strings = "..."
         else:
             text_strings = response.results[0].alternatives[0].transcript.capitalize() 
     else:
@@ -156,6 +156,7 @@ def find_pair(segments):
     labels = [segment.speaker for segment in segments]
     _, index = np.unique(labels, return_index=True)
     pairs = {labels[v]:k for k,v in enumerate(sorted(index))}
+    # sorted_labels = [pairs[label] for label in labels]
     return pairs
     
 def check_silence(audio, vad, sample_rate=16000, frame_duration_ms=30, silence_thresh=1):

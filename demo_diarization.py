@@ -19,7 +19,7 @@ def main(args):
         
     if args.opt == 'text':
         transcript_file = os.path.join(args.output_path, os.path.basename(args.audio_file)[:-4] + '_{}s_{}pad.txt'.format(args.num_speakers,
-                                                                                                                    args.pad_silence_ms))
+                                                                                                                          args.pad_silence_ms))
         wavTranscriber.write_stt(joined_segments,
                                  transcript_file, 
                                  aggressive=3,
@@ -43,7 +43,7 @@ if __name__ == '__main__':
                         help='output file path')
     parser.add_argument('--num_speakers', type=int, default=10, 
                         help='manual speaker limit')
-    parser.add_argument('--silence_thresh', type=int, default=50, 
+    parser.add_argument('--silence_thresh', type=int, default=0.9, 
                         help='remove silence speaker segment with given threshold, default "1 second"')
     parser.add_argument('--pad_silence_ms', type=int, default = 300,
                         help='pad silence duration in millisecond for each segment during voice activity detection')
