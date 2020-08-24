@@ -90,7 +90,7 @@ def write_audio_segments(segments, output_path, input_file_name, sample_rate=160
         duration = len(segment.bytes)/sample_rate/2
         tq = tqdm(total=duration)
         speaker = chr(ord("A")+segment.speaker)
-        tq.set_description('Speaker {}'.format(speaker))
+        tq.set_description('{}-> Speaker {}'.format(i, speaker))
         output_wave = os.path.join(output_path, "{}_Speaker_{}_{:.2f}_sec.wav".format(i, speaker, duration))
         write_wave(segment.bytes, output_wave, sample_rate)
         tq.update(duration)
@@ -111,14 +111,14 @@ def write_stt(segments, transcript_file, aggressive=3, sample_rate=16000, silenc
             duration = len(segment.bytes)/sample_rate/2
             tq = tqdm(total=duration)
             speaker = chr(ord("A")+segment.speaker)
-            tq.set_description('Speaker {}'.format(speaker))
+            tq.set_description('{}-> Speaker {}'.format(i, speaker))
             silence_flag = check_silence(segment.bytes, vad, sample_rate=sample_rate, frame_duration_ms=30, silence_thresh= silence_thresh)
             if not silence_flag:
                 output = segment_to_text(client, config, segment, sample_rate)
                 
             else:
                 output= PrintFormat.speaker_text(speaker, text_string='...') 
-            f.write(output)
+            f.write("{}-> {}".format(i, output))
             f.flush()   
             tq.update(duration)
             tq.close()
