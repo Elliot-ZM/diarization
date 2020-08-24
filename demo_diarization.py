@@ -43,7 +43,7 @@ if __name__ == '__main__':
                         help='output file path')
     parser.add_argument('--num_speakers', type=int, default=10, 
                         help='manual speaker limit')
-    parser.add_argument('--silence_thresh', type=int, default=0, 
+    parser.add_argument('--silence_thresh', type=int, default=50, 
                         help='remove silence speaker segment with given threshold, default "1 second"')
     parser.add_argument('--pad_silence_ms', type=int, default = 300,
                         help='pad silence duration in millisecond for each segment during voice activity detection')

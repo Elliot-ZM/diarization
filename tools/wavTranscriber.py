@@ -90,7 +90,7 @@ def write_audio_segments(segments, output_path, input_file_name, sample_rate=160
         duration = len(segment.bytes)/sample_rate/2
         tq = tqdm(total=duration)
         speaker = chr(ord("A")+segment.speaker)
-        tq.set_description('{}-> Speaker {}'.format(i, speaker))
+        tq.set_description('{}. Speaker {}'.format(i, speaker))
         output_wave = os.path.join(output_path, "{}_Speaker_{}_{:.2f}_sec.wav".format(i, speaker, duration))
         write_wave(segment.bytes, output_wave, sample_rate)
         tq.update(duration)
@@ -118,7 +118,7 @@ def write_stt(segments, transcript_file, aggressive=3, sample_rate=16000, silenc
                 
             else:
                 output= PrintFormat.speaker_text(speaker, text_string='...') 
-            f.write("{}-> {}".format(i, output))
+            f.write("{}. {}".format(i, output))
             f.flush()   
             tq.update(duration)
             tq.close()
@@ -129,7 +129,7 @@ def segment_to_text(client, config, segment, sample_rate=16000):
         audio = types.RecognitionAudio(content = segment.bytes)
         response = client.recognize(config, audio)
         if not response.results:
-            text = PrintFormat.speaker_text(speaker)
+            text_strings = ".."
         else:
             text_strings = response.results[0].alternatives[0].transcript.capitalize() 
     else:
@@ -156,7 +156,6 @@ def find_pair(segments):
     labels = [segment.speaker for segment in segments]
     _, index = np.unique(labels, return_index=True)
     pairs = {labels[v]:k for k,v in enumerate(sorted(index))}
-    # sorted_labels = [pairs[label] for label in labels]
     return pairs
     
 def check_silence(audio, vad, sample_rate=16000, frame_duration_ms=30, silence_thresh=1):
